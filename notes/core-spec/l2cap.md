@@ -124,3 +124,47 @@ The first LE-frame of the SDU shall contain the L2CAP SDU **Length field** that 
 ------
 
 ## SIGNALING PACKET FORMATS
+
+All signaling commands are sent over a signaling channel. 
+
+The signaling channel for managing channels over ACL-U logical links shall use **CID 0x0001** and the signaling channel for managing channels over LE-U logical links shall use **CID 0x0005**.
+
+ Multiple commands may be sent in a single C-frame over Fixed Channel CID 0x0001 while only one command per C-frame shall be sent over Fixed Channel CID 0x0005
+
+General format of L2CAP PDUs containing signaling commands (**C-frames**):
+
+![L2CAP](images/l2cap/C-frame.png)
+
+General format of all signaling commands (**C-frame payload**):
+
+![L2CAP](images/l2cap/C-frame-payload.png)
+
+- **Code** - identifies the type of command
+- **Identifier** - tag that matches responses with requests. The requesting device sets this field and the responding device uses the same value in its response. Within each signaling channel a different Identifier shall be used for each successive command.
+- **Length** - indicates the size in octets of the data field of the command only, i.e., it does not cover the Code, Identifier, and Length fields
+- **Data** - field is variable in length. The Code field determines the format of the Data field. The length field determines the length of the data field
+
+
+
+#### SIGNALING COMMANDS
+
+- **COMMAND REJECT (CODE 0x01)** - shall be sent in response to a command packet with an unknown command code or when sending the corresponding response is inappropriate.
+- **CONNECTION REQUEST (CODE 0x02)** - sent to create an L2CAP channel between two devices. The L2CAP channel shall be established before configuration begins.
+- **CONNECTION RESPONSE (CODE 0x03)** - when a device receives a Connection Request packet, it shall send a Connection Response packet.
+- **CONFIGURATION REQUEST (CODE 0x04)** - sent to establish an initial logical link transmission contract between two L2CAP entities and also to re-negotiate this contract whenever appropriate. The contract consists of a set of configuration parameter options. The only parameters that should be included in the Configuration Request packet are those that require different values than the default or previously agreed values.
+- **CONFIGURATION RESPONSE (CODE 0x05)** - sent in reply to Configuration Request packets except when the error condition is covered by a Command Reject response. Each configuration parameter value (if any is present) in a Configuration Response reflects an ’adjustment’ to a configuration parameter value that has been sent (or, in case of default values, implied) in the corresponding Configuration Request.
+- **DISCONNECTION REQUEST (CODE 0x06)** - terminating an L2CAP channel requires that a disconnection request be sent and acknowledged by a disconnection response.
+- **DISCONNECTION RESPONSE (CODE 0x07)** - disconnection responses shall be sent in response to each valid disconnection request.
+- **ECHO REQUEST (CODE 0x08)** - used to request a response from a remote L2CAP entity. These requests may be used for testing the link or for passing vendor specific information using the optional data field
+- **ECHO RESPONSE (CODE 0x09)** - sent upon receiving a valid Echo Request. 
+- **INFORMATION REQUEST (CODE 0x0A)** -  used to request implementation specific information from a remote L2CAP entity. An L2CAP implementation shall only use optional features or attribute ranges for which the remote L2CAP entity has indicated support through an Information Response. Until an Information Response which indicates support for optional features or ranges has been received only mandatory features and ranges shall be used.
+- **INFORMATION RESPONSE (CODE 0x0B)** - an information response shall be sent upon receiving a valid Information Request.
+- **CONNECTION PARAMETER UPDATE REQUEST (CODE 0x12)** - shall only be sent from the LE slave device to the LE master device and only if one or more of the LE slave Controller, the LE master Controller, the LE slave Host and the LE master Host do not support the **Connection Parameters Request Link Layer Control Procedure**. The Connection Parameter Update Request allows the LE slave Host to request a set of new connection parameters. When the LE master Host receives a Connection Parameter Update Request packet, depending on the parameters of other connections, the LE master Host may accept the requested parameters and deliver the requested parameters to its Controller or reject the request.
+- **CONNECTION PARAMETER UPDATE RESPONSE (CODE 0x13)** - shall only be sent from the LE master device to the LE slave device. The Connection Parameter Update Response packet shall be sent by the master Host when it receives a Connection Parameter Update Request packet. If the LE master Host accepts the request it shall send the connection parameter update to its Controller.
+- **LE CREDIT BASED CONNECTION REQUEST (CODE 0x14)** - sent to create and configure an L2CAP channel between two devices. The initial credit value indicates the number of LE-frames that the peer device can send to the L2CAP layer entity sending the LE Credit Based Connection Request
+- **LE CREDIT BASED CONNECTION RESPONSE (CODE 0x15)** - when a device receives a LE Credit Based Connection Request packet, it shall send a LE Credit Based Connection Response packet.
+- **LE FLOW CONTROL CREDIT (CODE 0x16)** - a device shall send a LE Flow Control Credit packet when it is capable of receiving additional LE-frames. The credit value field represents number of credits the receiving device can increment, corresponding to the number of LE-frames that can be sent to the peer device sending the LE Flow Control Credit packet.
+
+------
+
+## CONFIGURATION PARAMETER OPTIONS
