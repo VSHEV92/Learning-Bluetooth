@@ -168,3 +168,76 @@ General format of all signaling commands (**C-frame payload**):
 ------
 
 ## CONFIGURATION PARAMETER OPTIONS
+
+#### MAXIMUM TRANSMISSION UNIT (MTU)
+
+This option specifies the **maximum SDU size** the sender of this option is capable of accepting for a channel. MTU is not a negotiated value, it is an informational parameter that each device can specify independently. It indicates to the remote device that the local device can receive, in this channel, an MTU larger than the minimum required. L2CAP implementations shall support a minimum MTU size of 48 octets.
+
+
+
+#### FLUSH TIMEOUT OPTION
+
+This option is used to inform the recipient of the Flush Timeout the sender is going to use.
+
+- 0x0001 - no retransmissions at the baseband level should be performed since the minimum polling interval is 1.25 ms.
+- 0x0002 to 0xFFFE - Flush Timeout used by the baseband.
+- 0xFFFF - an infinite amount of retransmissions. This is also referred to as a ’reliable channel’. In this case, the baseband shall continue retransmissions until physical link loss is declared by link manager timeouts.
+
+
+
+#### QUALITY OF SERVICE (QOS) OPTION
+
+This option specifies a flow specification similar to **RFC 1363**. The Bluetooth QoS interface can handle the two directions (Tx and Rx) in the negotiation.
+
+L2CAP implementations are only required to support **’Best Effort’** service, support for any other service type is optional. Best Effort does not require any guarantees. If no QoS option is placed in the request, Best Effort shall be assumed. If any QoS guarantees are required then a QoS configuration request shall be sent.
+
+![L2CAP](images/l2cap/QoS-Config-Option.png)
+
+- **Flags** - reserved
+- **Service Type** - indicates the level of service required (No traffic, Best effort, Guaranteed)
+- **Token Rate** - represents the average data rate with which the application transmits data.  The Token Rate is the rate with which traffic credits are provided. Credits can be accumulated up to the Token Bucket Size. Traffic credits are consumed when data is transmitted by the application. When traffic is transmitted, and there are insufficient credits available, the traffic is non- conformant. The Quality of Service guarantees are only provided for conformant traffic. The Token Rate is specified in octets per second.
+- **Token Bucket Size** - The Token Bucket Size specifies a limit on the 'burstiness' with which the application may transmit data. The application may offer a burst of data equal to the Token Bucket Size instantaneously, limited by the Peak Bandwidth (see below). The Token Bucket Size is specified in octets.
+- **Peak Bandwidth** - The value of this field, expressed in octets per second, limits how fast packets from applications may be sent back-to-back. Some systems can take advantage of this information, resulting in more efficient resource allocation.
+- **Access Latency** - The value of this field is the maximum acceptable delay of an L2CAP packet to the air-interface. The precise interpretation of this number depends on over which interface this flow parameter is signaled. When signaled between two L2CAP peers, the Access Latency is the maximum acceptable delay between the instant when the L2CAP SDU is received from the upper layer and the start of the L2CAP SDU transmission over the air. The Access Latency is expressed in microseconds.
+- **Delay Variation** - The value of this field is the difference, in microseconds, between the maximum and minimum possible delay of an L2CAP SDU between two L2CAP peers. The Delay Variation is a purely informational parameter.
+
+
+
+**RETRANSMISSION AND FLOW CONTROL OPTION**
+
+This option specifies whether retransmission and flow control is used. If the feature is used both incoming and outgoing parameters are specified by this option.
+
+![L2CAP](images/l2cap/FC-Config-Option.png)
+
+- **Mode** - contains the requested mode of the link (L2CAP Basic Mode, Retransmission mode, Flow control mode, Enhanced Retransmission mode, Streaming mode). The Basic L2CAP mode is the default.
+- **TxWindow size** - specifies the size of the transmission window for Flow Control mode, Retransmission mode, and Enhanced Retransmission mode. In Retransmission mode and Flow Control mode this parameter Tx Window size should be made as large as possible to maximize channel utilization. Tx Window size also controls the delay on flow control action. The transmitting device can send as many PDUs fit within the window. In Enhanced Retransmission mode this value indicates the maximum number of I-frames that the sender of the option can receive without acknowledging some of the received frames.
+- **MaxTransmit** - controls the number of retransmissions that L2CAP is allowed to try in Retransmission mode and Enhanced Retransmission mode before accepting that a packet and the channel is lost. When a packet is lost after being transmitted MaxTransmit times the channel shall be disconnected by sending a Disconnect request. In Enhanced Retransmission mode a value of zero for MaxTransmit means infinite retransmissions.
+- **Retransmission time-out** - the value in milliseconds of the retransmission time-out (this value is used to initialize the RetransmissionTimer).
+- **Monitor time-out** - value in milliseconds of the interval at which S-frames should be transmitted on the return channel when no frames are received on the forward channel. (this value is used to initialize the MonitorTimer, see below). This timer ensures that lost acknowledgments are retransmitted.
+- **Maximum PDU payload Size (MPS)** - The maximum size of payload data in octets that the L2CAP layer entity sending the option in a Configuration Request is capable of accepting, i.e. the MPS corresponds to the maximum PDU payload size.
+
+
+
+#### FRAME CHECK SEQUENCE (FCS) OPTION
+
+This option is used to specify the type of Frame Check Sequence (FCS) that will be included on S/I-frames that are sent. The FCS option shall only be used when the mode is being, or is already configured to Enhanced Retransmission mode or Streaming mode. Value of 0x00 is set when the sender wishes to omit the FCS from S/I-frames.
+
+
+
+#### EXTENDED FLOW SPECIFICATION OPTION
+
+This option specifies a flow specification for requesting a desired Quality of Service (QoS) on a channel. The Extended Flow Specification shall be supported on all channels created over AMP-U logical links. Optionally, Extended Flow Specification may be supported on channels created over ACL-U logical links.
+
+![L2CAP](images/l2cap/EFC-Config-Option.png)
+
+
+
+#### EXTENDED WINDOW SIZE OPTION
+
+The sender of a Configuration Request command containing this option is suggesting the maximum window size (possibly based on its own internal L2CAP receive buffer resources) that the peer L2CAP entity should use when sending data.
+
+
+
+------
+
+## STATE MACHINE
