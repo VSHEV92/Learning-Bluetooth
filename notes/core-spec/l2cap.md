@@ -241,3 +241,76 @@ The sender of a Configuration Request command containing this option is suggesti
 ------
 
 ## STATE MACHINE
+
+This section is informative. The state machine does not necessarily represent all possible scenarios.
+
+There is a single state machine for each L2CAP connection-oriented channel that is active. A state machine is created for each new **L2CAP_ConnectReq** received. The state machine always starts in the **CLOSED** state.
+
+#### STATES
+
+- **CLOSED** – channel not connected.
+- **WAIT_CONNECT** – a connection request has been received, but only a connection response with indication “pending” can be sent.
+- **WAIT_CONNECT_RSP** – a connection request has been sent, pending a positive connect response.
+- **CONFIG** – the different options are being negotiated for both sides; this state comprises a number of substates
+- **OPEN** – user data transfer state.
+- **WAIT_DISCONNECT** – a disconnect request has been sent, pending a disconnect response.
+- **WAIT_CREATE** – a channel creation request has been received, but only a response with indication “pending” can be sent. This state is similar to WAIT_CONNECT.
+- **WAIT_CREATE_RSP** – a channel creation request has been sent, pending a channel creation response. This state is similar to WAIT_CONNECT_RSP.
+- **WAIT_MOVE** – a request to move the current channel to another Controller has been received, but only a response with indication “pending” can be sent.
+- **WAIT_MOVE_RSP** – a request to move a channel to another Controller has been sent, pending a move response
+- **WAIT_MOVE_CONFIRM** – a response to the move channel request has been sent, waiting for a confirmation of the move operation by the initiator side
+- **WAIT_CONFIRM_RSP** – a move channel confirm has been sent, waiting for a move channel confirm response.
+
+
+
+#### MESSAGES
+
+L2CAP Data message corresponds to one of the PDU formats used on connection-oriented data channels as described in section 3, including PDUs containing B-frames, I-frames, S-frames.
+
+
+
+#### INTERNAL EVENTS
+
+- **OpenChannel_Req** – a local L2CAP entity is requested to set up a new connection-oriented channel.
+- **OpenChannel_Rsp** – a local L2CAP entity is requested to finally accept or refuse a pending connection request.
+- **ConfigureChannel_Req** – a local L2CAP entity is requested to initiate an outgoing configuration request.
+- **CloseChannel_Req** – a local L2CAP entity is requesed to close a channel.
+- **SendData_Req** – a local L2CAP entity is requested to transmit an SDU.
+- **ReconfigureChannel_Req** – a local L2CAP entity is requested to reconfigure the parameters of a connection-oriented channel.
+- **OpenChannelCntrl_Req** – a local L2CAP entity is requested to set up a new connection over a Controller identified by a Controller ID.
+- **OpenChannelCntrl_Rsp** – a local L2CAP entity is requested to internally accept or refuse a pending connection over a Controller identified by a Controller ID.
+- **MoveChannel_Req** – a local L2CAP entity is requested to move the current channel to another Controller.
+- **ControllerLogicalLinkInd** – a Controller indicates the acceptance or rejection of a logical link request with an Extended Flow Specification.
+
+![L2CAP](images/l2cap/l2cap-fsm.png)
+
+
+
+#### CONFIGURATION SUBSTATES
+
+- **WAIT_CONFIG** – a device has sent or received a connection response, but has neither initiated a configuration request yet, nor received a configuration request with acceptable parameters.
+- **WAIT_SEND_CONFIG** – for the initiator path, a configuration request has not yet been initiated, while for the response path, a request with acceptable options has been received.
+- **WAIT_CONFIG_REQ_RSP** – for the initiator path, a request has been sent but a positive response has not yet been received, and for the acceptor path, a request with acceptable options has not yet been received.
+- **WAIT_CONFIG_RSP** – the acceptor path is complete after having responded to acceptable options, but for the initiator path, a positive response on the recent request has not yet been received.
+- **WAIT_CONFIG_REQ** – the initiator path is complete after having received a positive response, but for the acceptor path, a request with acceptable options has not yet been received.
+- **WAIT_IND_FINAL_RSP** – for both the initiator and acceptor, the Extended Flow Specification has been sent to the local Controller but neither a response from Controller nor the final configuration response has yet been received.
+- **WAIT_FINAL_RSP** – the device received an indication from the Controller accepting the Extended Flow Specification and has sent a positive response. It is waiting for the remote device to send a configuration response.
+- **WAIT_CONTROL_IND** – the device has received a positive response and is waiting for its Controller to accept or reject the Extended Flow Specification.
+
+![L2CAP](images/l2cap/l2cap-config-fsm.png)
+
+CONFIG state is entered via WAIT_CONFIG substate from either the CLOSED state, the WAIT_CONNECT state, or the WAIT_CONNECT_RSP state. The CONFIG state is left for the OPEN state if both the initiator and acceptor paths complete successfully.
+
+
+
+#### TIMERS EVENTS
+
+**RTX** - The Response Timeout eXpired (RTX) timer is used to terminate the channel when the remote endpoint is unresponsive to signaling requests. This timer is started when a signaling request is sent to the remote device. This timer is disabled when the response is received.
+
+**ERTX** - The Extended Response Timeout eXpired (ERTX) timer is used in place of the RTX timer when it is suspected the remote endpoint is performing additional processing of a request signal. This timer is started when the remote endpoint responds that a request is pending, e.g., when an L2CAP_ConnectRsp event with a “connect pending” result (0x0001) is received. This timer is disabled when the formal response is received or the physical link is lost.
+
+
+
+------
+
+## GENERAL PROCEDURES
