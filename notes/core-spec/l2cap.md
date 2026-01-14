@@ -314,3 +314,57 @@ CONFIG state is entered via WAIT_CONFIG substate from either the CLOSED state, t
 ------
 
 ## GENERAL PROCEDURES
+
+#### CONFIGURATION PROCESS
+
+Configuration consists of two processes, the **Standard** process and the **Lockstep** process.
+
+For both processes, configuring the channel parameters shall be done independently for both directions. Both configurations may be done in parallel. Each configuration parameter is one-directional.
+
+The configuration parameters describe the non default parameters the device sending a Configuration Request will accept. If a device needs to establish the value of a configuration parameter the remote device will accept, then it must wait for a configuration request containing that configuration parameter to be sent from the remote device.
+
+Configuration options that may be placed in a **Configuration Request**
+
+![L2CAP](images/l2cap/config-request-options.png)
+
+Configuration options that may beplaced in a **Configuration Response**
+
+![L2CAP](images/l2cap/config-response-options.png)
+
+
+
+#### LOCKSTEP CONFIGURATION PROCESS
+
+Configuration Request packets are sent to establish or change the channel parameters including the QoS contract between two L2CAP entities. 
+
+Unlike the Standard process, negotiation involving the sending of multiple **Configuration Request** packets shall not be performed. In other words, only one Configuration Request packet shall be sent by each L2CAP entity during the Lockstep configuration process.
+
+The **Extended Features mask** shall be obtained via the L2CAP Information Request/Response signaling mechanism (InfoType = 0x0002) prior to the issuance of the L2CAP Configuration Request.
+
+Configuration Response packets shall be sent in reply to Configuration Request packets except when the error condition is covered by a Command Reject response.
+
+The recipient of a Configuration Request shall perform all necessary checks with the Controller to validate that the requested QoS can be granted. In the
+case of a BR/EDR or BR/EDR/LE Controller the L2CAP layer performs the Controller checks. 
+
+If **HCI** is used then the L2CAP entity should check that the requested QoS can be achieved over the HCI transport. In order to perform these checks, the recipient needs to have the QoS parameters for both directions. 
+
+In order for each side to determine when to perform relevant Controller checks, each side will reply with a result “**Pending**” (0x0004). After the Configuration Response is received with result “Pending,” L2CAP may issue the necessary checks with the Controller.
+
+If the Controller cannot support the Extended Flow Specifications with service type “**Guaranteed**,” then the recipient of the Configuration Request shall send a Configuration Response indicating a result code of “**Failure - flow spec rejected**” (0x0005). If the Controller indicates that it can support the Extended Flow Specifications, then the recipient of the Configuration Request shall send a Configuration Response with result code of “**Success**” (0x0000) with no parameters.
+
+
+
+#### STANDARD CONFIGURATION PROCESS
+
+There are two types of configuration parameters: negotiable and non-negotiable.
+
+**Negotiable** parameters are those that a remote side receiving a Configuration Request can disagree with by sending a Configuration Response with the **Unacceptable Parameters** (0x0001) result code, proposing new values that can be accepted.
+
+**Non-negotiable** parameters are only informational and the recipient of a Configuration Request cannot disagree with them but can provide adjustments to the values in a positive Configuration Response.
+
+For the Standard process the following general procedure shall be used for each direction:
+
+- Local device informs the remote device of the parameters that the local device will accept using a Configuration Request.
+- Remote device responds, agreeing or disagreeing with these values, including the default ones, using a Configuration Response.
+- The local and remote devices repeat steps (1) and (2) until agreement on all parameters is reached.
+
