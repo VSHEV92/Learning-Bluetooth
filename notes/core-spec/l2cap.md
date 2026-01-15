@@ -368,3 +368,33 @@ For the Standard process the following general procedure shall be used for each 
 - Remote device responds, agreeing or disagreeing with these values, including the default ones, using a Configuration Response.
 - The local and remote devices repeat steps (1) and (2) until agreement on all parameters is reached.
 
+
+
+### FRAGMENTATION AND RECOMBINATION
+
+**Fragmentation** is the breaking down of PDUs into smaller pieces for delivery from L2CAP to the lower layer. **Recombination** is the process of reassembling a PDU from fragments delivered up from the lower layer.
+
+![L2CAP](images/l2cap/fragmentation.png)
+
+An L2CAP implementation may **fragment** any L2CAP PDU for delivery to the lower layers. If L2CAP runs directly over the Controller without HCI, then an implementation may fragment the PDU into multiple Controller packets for transmission over the air. If L2CAP runs above the HCI, then an implementation may send HCI transport sized fragments to the Controller. All L2CAP fragments associated with an L2CAP PDU shall be processed for transmission by the Controller before any other L2CAP PDU for the same logical transport shall be processed.
+
+Controllers will attempt to deliver packets in sequence and without errors. **Recombination** of fragments may occur in the Controller but ultimately it is the responsibility of L2CAP to reassemble PDUs and SDUs and to check the length field of the SDUs. As the Controller receives packet fragments, it either signals the L2CAP layer on the arrival of each fragment, or accumulates a number of fragments (before the receive buffer fills up or a timer expires) before passing packets to the L2CAP layer.
+
+
+
+### ENCAPSULATION OF SDUs
+
+All SDUs are encapsulated into one or more L2CAP PDUs.
+
+In Basic L2CAP mode, an SDU shall be encapsulated with a minimum of L2CAP protocol elements, resulting in a type of L2CAP PDU called a Basic Information Frame (**B-frame**).
+
+**Segmentation** and **Reassembly** operations are only used in Enhanced Retransmission mode, Streaming mode, Retransmission mode, and Flow
+Control mode. SDUs may be segmented into a number of smaller packets called SDU segments. Each segment shall be encapsulated with L2CAP protocol elements resulting in an L2CAP PDU called an Information Frame (**I-frame**).
+
+![L2CAP](images/l2cap/segmentation.png)
+
+
+
+------
+
+## PROCEDURES FOR FLOW CONTROL AND RETRANSMISSION
