@@ -398,3 +398,87 @@ Control mode. SDUs may be segmented into a number of smaller packets called SDU 
 ------
 
 ## PROCEDURES FOR FLOW CONTROL AND RETRANSMISSION
+
+
+
+#### FUNCTION OF PDU TYPES FOR FLOW CONTROL AND RETRANSMISSION
+
+**Information frame (I-frame)** = sequentially numbered frames containing information fields. I-frames also include some of the functionality of RR frames
+
+**Supervisory Frame (S-frame)** - used to control the transmission of I-frames. For Retransmission mode and Flow Control mode, the S-frame has two formats: 
+
+- **Receiver Ready (RR)** - Acknowledge I-frames numbered up to and including **ReqSeq** - 1. Enable or disable retransmission of I-frames by updating the receiver with the current status of the Retransmission Disable Bit.
+- **Reject (REJ)** - used to request retransmission of all I-frames starting with the I-frame with **TxSeq** equal to **ReqSeq** specified in the REJ. The value of ReqSeq in the REJ frame acknowledges I-frames numbered up to and including ReqSeq - 1.
+
+The sending and receiving peer uses the following **Sequence numbers**:
+
+- **TxSeq** – the send Sequence number used to sequentially number each new I-frame transmitted
+- **ReqSeq** – The Sequence number sent in an acknowledgment frame to request transmission of I-frame with TxSeq = ReqSeq and acknowledge receipt of I-frames up to and including (ReqSeq-1).
+
+
+
+#### RETRANSMISSION MODE
+
+A new I-frame shall only be **transmitted** when the **TxWindow** is not full. No I- frames shall be transmitted if the last **RetransmissionDisableBit** (R) received is set to one. A previously transmitted I-frame may be **retransmitted** as a result of an error recovery procedure, even if the **TxWindow** is full. When an I-frame is retransmitted it shall always be sent with the same **TxSeq** value used in its initial transmission.
+
+Upon **receipt** of a valid I-frame with **TxSeq** equal to **ExpectedTxSeq**, the frame shall be accepted for the SDU reassembly function. **ExpectedTxSeq** is used by the reassembly function. The first valid I-frame received after an **REJ** was sent, with a **TxSeq** of the received I-frame equal to **ReqSeq** of the **REJ**, shall clear the **REJ Exception** condition.
+
+The acknowledgment may either be an **RR** or an **I-frame**. The acknowledgment shall be sent to the peer L2CAP entity with **ReqSeq** equal to **BufferSeq**. When there are no I-frames buffered for pulling **ExpectedTxSeq** is equal to **BufferSeq**.
+
+Upon receipt of a valid **REJ** frame, where **ReqSeq** identifies an I-frame not yet acknowledged, the **ReqSeq** acknowledges I-frames with **TxSeq** up to and including **ReqSeq - 1**. Therefore the **REJ** acknowledges all I-frames before the I-frame it is rejecting.
+
+A counter, **TransmitCounter**, counts the number of times an L2CAP PDU has been transmitted. This shall be set to 1 after the first transmission. If the **RetransmissionTimer** expires the following actions: Increment the **TransmitCounter**, Retransmit the last unacknowledged I-frame. If the **TransmitCounter** is equal to **MaxTransmit** this channel to the peer entity shall be assumed lost. The channel shall move to the **CLOSED** state
+
+
+
+#### FLOW CONTROL MODE
+
+When a link is configured to work in **flow control mode**, the flow control operation is similar to the procedures in **retransmission mode**, but all operations dealing with CRC errors in received packets are not used.
+
+Therefore
+
+- **REJ** frames shall not be used in Flow Control Mode.
+- The **RetransmissionDisableBit** shall always be set to zero in the transmitter, and shall be ignored in the receiver.
+
+
+
+#### ENHANCED RETRANSMISSION MODE
+
+**Enhanced Retransmission** mode operates as an HDLC balanced data link operational mode. Either L2CAP entity may send frames at any time without
+receiving explicit permission from the other L2CAP entity. A transmission may contain single or multiple frames and shall be used for I-frame transfer and/or to indicate status change.
+
+Enhanced Retransmission mode uses I-frames to transfer upper layer information and S-frames for supervision. There are four S-frames defined:
+
+- **Receiver Ready (RR)** - shall be used by an L2CAP entity to indicate that it is ready to receive I-frames and acknowledge previously received I-frames numbered up to ReqSeq - 1 inclusive. An RR with P-bit set to 1 (P=1) is used to indicate the clearance of any busy condition that was initiated by an earlier transmission of an RNR frame by the same L2CAP entity.
+- **Reject (REJ)** - shall be used by an L2CAP entity to request retransmission of I-frames starting with the frame numbered ReqSeq. I-frames numbered ReqSeq - 1 and below shall be considered acknowledged.
+- **Receiver Not Ready (RNR)** - shall be used by an L2CAP entity to indicate a busy condition (i.e. temporary inability to receive I-frames). I-frames numbered up to ReqSeq - 1 inclusive shall be considered acknowledged. The I-frame numbered ReqSeq and any subsequent I-frames sent shall not be considered acknowledged. The acceptance status of these I-frames shall be indicated in subsequent transfers.
+- **Selective Reject (SREJ)** - shall be used by an L2CAP entity to request retransmission of one I-frame. The ReqSeq shall indicate the TxSeq of the earliest I-frame to be retransmitted (not yet reported by a SREJ). If the P-bit is set to 1 then I-frames numbered up to ReqSeq -1 inclusive shall be considered acknowledged. If the P-bit is set to 0 then the ReqSeq field in the SREJ shall not indicate acknowledgment of I-frames.
+
+
+
+#### STREAMING MODE
+
+When a link is configured to work in Streaming Mode, the frame format for outgoing data is the same as for Enhanced Retransmission mode but frames
+are not acknowledged. Therefore
+
+- RR, REJ, RNR and SREJ frames shall not be used in Streaming Mode.
+- The F-bit shall always be set to zero in the transmitter, and shall be ignored in the receiver.
+- the MonitorTimer and RetransmissionTimer shall not be used in Streaming mode.
+
+When **transmitting** a new I-frame the control field parameter ReqSeq shall be set to 0, TxSeq shall be set to NextTXSeq and NextTXSeq shall be incremented by one.
+
+Upon **receipt** of a valid I-frame with TxSeq equal to ExpectedTxSeq, the frame shall be made available to the reassembly function. ExpectedTxSeq shall be incremented by one.
+
+
+
+------
+
+## PROCEDURES FOR CREDIT BASED FLOW CONTROL
+
+**LE Credit Based Flow Control Mode** is used for LE L2CAP connection oriented channels with flow control using a **credit based scheme** for L2CAP data (i.e. not signaling packets).
+
+The number of **credits** (LE-frames) that can be received by a device on an L2CAP channel is determined during connection establishment.
+
+LE-frames shall only be sent on an L2CAP channel if the device has a credit count greater than zero for that L2CAP channel. For each LE-frame sent the device decreases the credit count for that L2CAP channel by one.
+
+The peer device may return credits for an L2CAP channel at any time by sending an LE Flow Control Credit packet. When a credit packet is received by a device it shall increment the credit count for that L2CAP channel by the value of the Credits field in this packet.
