@@ -158,3 +158,114 @@ The GATT profile defines a standard set of characteristic descriptors that can b
 
 
 ## GATT FEATURE REQUIREMENTS
+
+There are 11 features defined in the GATT Profile:
+1. Server Configuration
+2. Primary Service Discovery
+3. Relationship Discovery
+4. Characteristic Discovery
+5. Characteristic Descriptor Discovery
+6. Reading a Characteristic Value
+7. Writing a Characteristic Value
+8. Notification of a Characteristic Value
+9. Indication of a Characteristic Value
+10. Reading a Characteristic Descriptor
+11. Writing a Characteristic Descriptor
+
+
+
+### SERVER CONFIGURATION
+
+This procedure is used by the client to configure the Attribute Protocol.
+
+- **Exchange MTU** - This sub-procedure is used by the client to set the ATT_MTU to the maximum possible value that can be supported by both devices when the client supports a value greater than the default ATT_MTU for the Attribute Protocol. The Attribute Protocol Exchange MTU Request is used by this sub-procedure. The Client Rx MTU parameter shall be set to the maximum MTU that this client can receive.
+
+
+
+### PRIMARY SERVICE DISCOVERY
+
+This procedure is used by a client to discover primary services on a server.
+
+- **Discover All Primary Services** - This sub-procedure is used by a client to discover all the primary services on a server. The Attribute Protocol Read By Group Type Request shall be used with the Attribute Type parameter set to the UUID for «Primary Service». The Starting Handle shall be set to 0x0001 and the Ending Handle shall be set to 0xFFFF.
+- **Discover Primary Service by Service UUID** - This sub-procedure is used by a client to discover a specific primary service on a server when only the Service UUID is known. The primary service being discovered is identified by the service UUID. The Attribute Protocol Find By Type Value Request shall be used with the Attribute Type parameter set to the UUID for «Primary Service» and the Attribute Value set to the 16-bit Bluetooth UUID or 128-bit UUID for the specific primary service. The Starting Handle shall be set to 0x0001 and the Ending Handle shall be set to 0xFFFF.
+
+
+
+### RELATIONSHIP DISCOVERY 
+
+This procedure is used by a client to discover service relationships to other services.
+
+- **Find Included Services** - This sub-procedure is used by a client to find include service declarations within a service definition on a server. The service specified is identified by the service handle range. The Attribute Protocol Read By Type Request shall be used with the Attribute Type parameter set to the UUID for «Include» The Starting Handle shall be set to starting handle of the specified service and the Ending Handle shall be set to the ending handle of the specified service.
+
+
+
+### CHARACTERISTIC DISCOVERY
+
+This procedure is used by a client to discover service characteristics on a server. Once the characteristics are discovered additional information about the characteristics can be discovered or accessed using other procedures.
+
+- **Discover All Characteristics of a Service** - This sub-procedure is used by a client to find all the characteristic declarations within a service definition on a server when only the service handle range is known. The Attribute Protocol Read By Type Request shall be used with the Attribute Type parameter set to the UUID for «Characteristic» The Starting Handle shall be set to starting handle of the specified service and the Ending Handle shall be set to the ending handle of the specified service.
+- **Discover Characteristics by UUID** - This sub-procedure is used by a client to discover service characteristics on a server when only the service handle ranges are known and the characteristic UUID is known. The characteristic being discovered is identified by the characteristic UUID. The Attribute Protocol Read By Type Request is used to perform the beginning of the sub-procedure. The Attribute Type is set to the UUID for «Characteristic» and the Starting Handle and Ending Handle parameters shall be set to the service handle range.
+
+
+
+### CHARACTERISTIC DESCRIPTOR DISCOVERY
+
+This procedure is used by a client to discover characteristic descriptors of a characteristic. Once the characteristic descriptors are discovered additional information about the characteristic descriptors can be accessed using other procedures.
+
+- **Discover All Characteristic Descriptors** - This sub-procedure is used by a client to find all the characteristic descriptor’s Attribute Handles and Attribute Types within a characteristic definition when only the characteristic handle range is known. The characteristic specified is identified by the characteristic handle range. The Attribute Protocol Find Information Request shall be used with the Starting Handle set to the handle of the specified characteristic value + 1 and the Ending Handle set to the ending handle of the specified characteristic.
+
+
+
+### CHARACTERISTIC VALUE READ
+
+This procedure is used to read a Characteristic Value from a server.
+
+- **Read Characteristic Value** - This sub-procedure is used to read a Characteristic Value from a server when the client knows the Characteristic Value Handle. The Attribute Protocol Read Request is used with the Attribute Handle parameter set to the Characteristic Value Handle. The Read Response returns the Characteristic Value in the Attribute Value parameter.
+- **Read Using Characteristic UUID** - This sub-procedure is used to read a Characteristic Value from a server when the client only knows the characteristic UUID and does not know the handle of the characteristic. The Attribute Protocol Read By Type Request is used to perform the sub- procedure. The Attribute Type is set to the known characteristic UUID and the Starting Handle and Ending Handle parameters shall be set to the range over which this read is to be performed. This is typically the handle range for the service in which the characteristic belongs.
+- **Read Long Characteristic Values** - This sub-procedure is used to read a Characteristic Value from a server when the client knows the Characteristic Value Handle and the length of the Characteristic Value is longer than can be sent in a single Read Response Attribute Protocol message. The Attribute Protocol Read Blob Request is used to perform this sub-procedure. The Attribute Handle shall be set to the Characteristic Value Handle of the Characteristic Value to be read. The Value Offset parameter shall be the offset within the Characteristic Value to be read.
+- **Read Multiple Characteristic Values** - This sub-procedure is used to read multiple Characteristic Values from a server when the client knows the Characteristic Value Handles. The Attribute Protocol Read Multiple Requests is used with the Set Of Handles parameter set to the Characteristic Value Handles. The Read Multiple Response returns the Characteristic Values in the Set Of Values parameter.
+
+
+
+### CHARACTERISTIC VALUE WRITE
+
+This procedure is used to write a Characteristic Value to a server.
+
+- **Write Without Response** - This sub-procedure is used to write a Characteristic Value to a server when the client knows the Characteristic Value Handle and the client does not need an acknowledgment that the write was successfully performed. The Attribute Protocol Write Command is used for this sub-procedure. The Attribute Handle parameter shall be set to the Characteristic Value Handle. The Attribute Value parameter shall be set to the new Characteristic Value.
+- **Signed Write Without Response** - This sub-procedure is used to write a Characteristic Value to a server when the client knows the Characteristic Value Handle and the ATT Bearer is not encrypted. This sub-procedure shall only be used if the Characteristic Properties authenticated bit is enabled and the client and server device share a bond. The Attribute Protocol Signed Write Command is used for this sub-procedure.
+- **Write Characteristic Value** - This sub-procedure is used to write a Characteristic Value to a server when the client knows the Characteristic Value Handle. The Attribute Protocol Write Request is used to for this sub-procedure. The Attribute Handle parameter shall be set to the Characteristic Value Handle. The Attribute Value parameter shall be set to the new characteristic. A Write Response shall be sent by the server if the write of the Characteristic Value succeeded.
+- **Write Long Characteristic Values** - This sub-procedure is used to write a Characteristic Value to a server when the client knows the Characteristic Value Handle but the length of the Characteristic Value is longer than can be sent in a single Write Request Attribute Protocol message. The Attribute Protocol Prepare Write Request and Execute Write Request are used to perform this sub-procedure.
+- **Reliable Writes** - This sub-procedure is used to write a Characteristic Value to a server when the client knows the Characteristic Value Handle, and assurance is required that the correct Characteristic Value is going to be written by transferring the Characteristic Value to be written in both directions before the write is performed. The sub-procedure has two phases; the first phase prepares the Characteristic Values to be written. To do this, the client transfers the Characteristic Values to the server. The server checks the validity of the Characteristic Values. The client also checks each Characteristic Value to verify it was correctly received by the server using the server responses. Once this is complete, the second phase performs the execution of all of the prepared Characteristic Value writes on the server from this client.
+
+
+
+### CHARACTERISTIC VALUE NOTIFICATION
+
+This procedure is used to notify a client of the value of a Characteristic Value from a server. Notifications can be configured using the Client Characteristic Configuration descriptor.
+
+- **Notifications** - This sub-procedure is used when a server is configured to notify a Characteristic Value to a client without expecting any Attribute Protocol layer acknowledgment that the notification was successfully received.
+
+
+
+### CHARACTERISTIC VALUE INDICATIONS
+
+This procedure is used to indicate the Characteristic Value from a server to a client. Indications can be configured using the Client Characteristic Configuration descriptor. A profile defines when to use Indications.
+
+- **Indications** - This sub-procedure is used when a server is configured to indicate a Characteristic Value to a client and expects an Attribute Protocol layer acknowledgment that the indication was successfully received.
+
+
+
+### CHARACTERISTIC DESCRIPTORS
+
+This procedure is used to read and write characteristic descriptors on a server.
+
+- **Read Characteristic Descriptors** - This sub-procedure is used to read a characteristic descriptor from a server when the client knows the characteristic descriptor declaration’s Attribute handle. The Attribute Protocol Read Request is used for this sub-procedure. The Read Request is used with the Attribute Handle parameter set to the characteristic descriptor handle. The Read Response returns the characteristic descriptor value in the Attribute Value parameter.
+- **Read Long Characteristic Descriptors** - This sub-procedure is used to read a characteristic descriptor from a server when the client knows the characteristic descriptor declaration’s Attribute handle and the length of the characteristic descriptor declaration is longer than can be sent in a single Read Response Attribute Protocol message. The Attribute Protocol Read Blob Request is used to perform this sub-procedure.
+- **Write Characteristic Descriptors** - This sub-procedure is used to write a characteristic descriptor value to a server when the client knows the characteristic descriptor handle. The Attribute Protocol Write Request is used for this sub-procedure. The Attribute Handle parameter shall be set to the characteristic descriptor handle. The Attribute Value parameter shall be set to the new characteristic descriptor value. A Write Response shall be sent by the server if the write of the characteristic descriptor value succeeded.
+- **Write Long Characteristic Descriptors** - This sub-procedure is used to write a characteristic descriptor value to a server when the client knows the characteristic descriptor handle but the length of the characteristic descriptor value is longer than can be sent in a single Write Request Attribute Protocol message. The Attribute Protocol Prepare Write Request and Execute Write Request are used to perform this sub-procedure.
+
+
+
+------
+
+## L2CAP INTEROPERABILITY REQUIREMENTS
