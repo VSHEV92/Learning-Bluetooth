@@ -8,6 +8,9 @@
 
 - [Logical Link Control And Adaptation Protocol (L2CAP)](./notes/core-spec/l2cap.md)
 - [Attribute Protocol (ATT)](./notes/core-spec/att.md)
+- [Generiv Attribute Profile (GATT)](./notes/core-spec/gatt.md)
+
+
 
 **BLE Controller**
 

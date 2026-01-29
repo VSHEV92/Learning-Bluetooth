@@ -269,3 +269,33 @@ This procedure is used to read and write characteristic descriptors on a server.
 ------
 
 ## L2CAP INTEROPERABILITY REQUIREMENTS
+
+Over LE, the ATT Bearer is the Attribute L2CAP fixed channel. L2CAP fixed CID 0x0004 shall be used for the Attribute Protocol.
+
+Both a GATT client and server implementations shall support an ATT_MTU not less than the default value (23).
+
+The retransmission and flow control mode for this channel shall be Basic L2CAP mode.  The default parameters for the payload of the L2CAP B-frame shall be a single Attribute PDU.
+
+
+
+------
+
+## GENERIC ATTRIBUTE PROFILE SERVICE
+
+All characteristics defined within this section shall be contained in a primary service with the service UUID set to «GATT Service».
+
+- **Service Changed (0x2A05 UUID)** - is a control-point attribute that shall be used to indicate to connected devices that services have changed (i.e., added, removed or modified). This Characteristic Value shall be configured to be indicated, using the Client Characteristic Configuration descriptor by a client.
+
+The **Service Changed Characteristic Value** is two 16-bit Attribute Handles concatenated together indicating the beginning and ending Attribute Handles affected by an addition, removal, or modification to a GATT-based service on the server.
+
+If the list of GATT based services and the service definitions cannot change for the lifetime of the device then this characteristic **shall not exist**, otherwise this characteristic **shall exist**.
+
+
+
+------
+
+## SECURITY CONSIDERATIONS
+
+The list of services and characteristics that a device supports is not considered private or confidential information, and therefore the Service and Characteristic Discovery procedures shall always be permitted.
+
+If ATT a request is issued when the physical link is unauthenticated or unencrypted, the server shall send an Error Response. The client wanting to read or write this characteristic can then request that the physical link be authenticated using the GAP authentication procedure, and once this has been completed, send the request again.
