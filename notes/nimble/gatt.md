@@ -2,6 +2,29 @@
 
 ------
 
+## Usage
+
+
+
+#### Client
+
+- Use GATT procedures from **ble_gatt.h** to get server info, read and write characteristics.
+- Process notifications inside gap_event_handler when event type is **BLE_GAP_EVENT_NOTIFY_RX**
+
+
+
+#### Server
+
+- Define server services and characteristics using **ble_gatt_svc_def** and **ble_gatt_chr_def**. Define callbacks for access to each characteristic
+- Call **ble_gatts_count_cfg()** with define services as argument to update service and attribute counters. Thus numbers used at startup to allocate needed amount of memory
+- Call **ble_gatts_add_svcs()** with define services as argument to add them to GATT 
+- Register callback for subscribe GAP event - event with type **BLE_GAP_EVENT_SUBSCRIBE**. Store connection handler, characteristic handler and other data to some memory area inside this callback
+- If needed notify client using GATT Procedures using **ble_gatts_indicate()** and **ble_gatts_notify()**
+
+
+
+------
+
 ## Header Files
 
 
@@ -54,3 +77,24 @@ This file contain API used by server to interact with GATT. This function is use
 ### nimble/host/src/ble_gattc.c
 
 This file contain API used by client to interact with GATT
+
+1. **Defines**:
+
+   - Define GATT Procedures Codes
+
+2. **Structures**:
+
+   - Structures for each procedures responses - possible response types, callbacks and so on
+
+3. **API**: 
+
+   - Callbacks for Responses from ATT level. Function names contain **rx** substring in name
+   - Define GATT procedures functions
+
+   ​	
+
+### nimble/host/src/ble_gattc_cache.c
+
+### nimble/host/src/ble_gattc_cache_conn.c
+
+This file contain functions for GATT Service Caching

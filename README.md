@@ -24,11 +24,5 @@
 
 - [Logical Link Control And Adaptation Protocol (L2CAP)](./notes/nimble/l2cap.md)
 - [Attribute Protocol (ATT)](./notes/nimble/att.md)
+- [Generiv Attribute Profile (GATT)](./notes/nimble/gatt.md)
 
-
-
-------
-
-### BLUEDROID STACK
-
-- TODO
