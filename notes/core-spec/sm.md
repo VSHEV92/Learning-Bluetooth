@@ -184,3 +184,41 @@ The slave’s Host receives the EDIV and Rand values and provides a Long Term Ke
 ------
 
 ## SECURITY MANAGER PROTOCOL
+
+All SMP commands are sent over the Security Manager Channel which is an L2CAP fixed channel.
+
+![GATT](images/sm/smp-command.png)
+
+- **Code** (1 octet) - is one octet long and identifies the type of command
+- **Data** (0 or more octets) -  is variable in length. The Code field determines the format of the Data field.
+
+
+
+The **SMP commands** defined in this section are used to perform Pairing Feature Exchange and key generation:
+
+- **Security Request** - The Security Request command is used by the slave to request that the master initiates security with the requested security properties. Fields -AuthReq
+- **Pairing Request** - The initiator starts the Pairing Feature Exchange by sending a Pairing Request command to the responding device. Fields - IO Capability, OOB data, AuthReq, Maximum Encryption Key Size, Initiator Key Distribution / Generation, Responder Key Distribution / Generation
+- **Pairing Response** - This command is used by the responding device to complete the Pairing Feature Exchange after it has received a Pairing Request command from the initiating device, if the responding device allows pairing. Fields - IO Capability, OOB data, AuthReq, Maximum Encryption Key Size, Initiator Key Distribution, Responder Key Distribution
+- **Pairing Confirm** - This is used following a successful Pairing Feature Exchange to start STK Generation for LE legacy pairing and LTK Generation for LE Secure Connections pairing. In LE legacy pairing, the initiating device sends **Mconfirm** and the responding device sends **Sconfirm**. In LE Secure Connections, **Ca** and **Cb** are send.
+- **Pairing Random** - This command is used by the initiating and responding device to send the random number used to calculate the Confirm value sent in the Pairing Confirm command. In LE legacy pairing, the initiating device sends **Mrand** and the responding device sends **Srand**. In LE Secure Connections, the initiating device sends **Na** and the responding device sends **Nb**.
+- **Pairing Failed** - This is used when there has been a failure during pairing and reports that the pairing procedure has been stopped and no further communication for the current pairing procedure is to occur. The Reason field indicates why the pairing failed.
+- **Pairing Public Key** - This message is used to transfer the device’s local public key (X and Y co-ordinates) to the remote device. This message is used by both the initiator and responder. This PDU is only used for Secure Connections.
+- **Pairing DHKey Check** - This message is used to transmit the 128-bit DHKey Check values (Ea/Eb) generated using f6. This message is used by both initiator and responder. This PDU is only used for LE Secure Connections.
+- **Keypress Notification** - This message is used during the Passkey Entry protocol by a device with KeyboardOnly IO capabilities to inform the remote device when keys have been entered or erased.
+
+
+
+The keys which are to be distributed in the **Transport Specific Key Distribution phase** are indicated in the Key Distribution field of the Pairing Request and Pairing Response. This phase support following commands:
+
+- **Encryption Information** - is used in the LE legacy pairing Transport Specific Key Distribution to distribute **LTK** that is used when encrypting future connections.
+- **Master Identification** - is used in the LE legacy pairing Transport Specific Key Distribution phase to distribute **EDIV** and **Rand** which are used when encrypting future connections.
+- **Identity Information** - is used in the Transport Specific Key Distribution phase to distribute the **IRK**.
+- **Identity Address Information** - is used in the Transport Specific Key Distribution phase to distribute its public device address or static random address.
+- **Signing Information** - is used in the Transport Specific Key Distribution to distribute the CSRK which a device uses to sign data.
+
+------
+
+
+
+
+
