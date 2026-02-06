@@ -9,7 +9,8 @@
 - [Logical Link Control And Adaptation Protocol (L2CAP)](./notes/core-spec/l2cap.md)
 - [Attribute Protocol (ATT)](./notes/core-spec/att.md)
 - [Security Manager (SM)](./notes/core-spec/sm.md)
-- [Generiv Attribute Profile (GATT)](./notes/core-spec/gatt.md)
+- [Generic Access Profile (GAP)](./notes/core-spec/gap.md)
+- [Generic Attribute Profile (GATT)](./notes/core-spec/gatt.md)
 
 
 
@@ -26,5 +27,6 @@
 - [Logical Link Control And Adaptation Protocol (L2CAP)](./notes/nimble/l2cap.md)
 - [Attribute Protocol (ATT)](./notes/nimble/att.md)
 - [Security Manager (SM)](./notes/nimble/sm.md)
-- [Generiv Attribute Profile (GATT)](./notes/nimble/gatt.md)
+- [Generic Attribute Profile (GATT)](./notes/nimble/gatt.md)
+- [Generic Access Profile (GAP)](./notes/nimble/gap.md)
 
