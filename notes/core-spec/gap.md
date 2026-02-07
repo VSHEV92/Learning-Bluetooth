@@ -58,4 +58,43 @@ Several different modes and procedures may be performed simultaneously over an L
 
 
 
-### BROADCAST MODE AND OBSERVATION PROCEDURE
+#### BROADCAST MODE AND OBSERVATION PROCEDURE
+
+The broadcast mode and observation procedure allow two devices to communicate in a unidirectional connectionless manner using the advertising events.
+
+The **broadcast mode** provides a method for a device to send connectionless data in advertising events. A device in the broadcast mode may send non-connectable and non- scannable undirected or nonconnectable and non-scannable directed advertising events anonymously by excluding the broadcaster's address.
+
+The **observation procedure** provides a method for a device to receive connectionless data from a device that is sending advertising events. A device performing the observation procedure may use active scanning to also receive scan response data sent by any device in the broadcast mode that advertises using scannable advertising events.
+
+
+
+#### DISCOVERY MODES AND PROCEDURES
+
+All devices shall be in either non-discoverable mode or one of the discoverable modes. 
+
+A device in the discoverable mode shall be in either the **general discoverable mode** or the limited discoverable mode. A device in the **non-discoverable mode** is not discoverable. 
+
+Devices operating in either the general discoverable mode or the limited discoverable mode can be found by the discovering device.
+
+- **Non-Discoverable Mode** - A device configured in non-discoverable mode will not be discovered by any device that is performing either the general discovery procedure or the limited discovery procedure.
+
+- **Limited Discoverable Mode** - Devices configured in the limited discoverable mode are discoverable for a limited period of time by other devices performing the limited or general device discovery procedure. The limited discoverable mode is typically used when a user performs a specific action to make the device discoverable for a limited period of time. Devices shall remain in the limited discoverable mode no longer than **Tgap(lim_adv_timeout)**.
+
+- **General Discoverable Mode** - Devices configured in general discoverable mode are intended to be discoverable by devices performing the general discovery procedure. The general discoverable mode is typically used when the device is intending to be discoverable for a long period of time.
+
+  
+
+- **Limited Discovery Procedure** - A device performing the limited discovery procedure receives the device address, advertising data and scan response data from devices in the limited discoverable mode only.
+
+- **General Discovery Procedure** - A device performing the general discovery procedure receives the device address, advertising data and scan response data from devices in the limited discoverable mode or the general discoverable mode.
+
+- **Name Discovery Procedure** - The name discovery procedure is used to obtain the Bluetooth Device Name of remote connectable device. If the complete device name is not acquired while performing either the limited discovery procedure or the general discovery procedure, then the name discovery procedure may be performed.
+
+  
+
+#### CONNECTION MODES AND PROCEDURES
+
+
+
+
+
