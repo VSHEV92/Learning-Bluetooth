@@ -94,7 +94,98 @@ Devices operating in either the general discoverable mode or the limited discove
 
 #### CONNECTION MODES AND PROCEDURES
 
+The connection modes and procedures allow a device to establish a connection to another device.
+
+When devices are connected, the parameters of the connection can be updated with the Connection Parameter Update procedure. The connected device may terminate the connection using the Terminate Connection procedure.
+
+- **Non-Connectable Mode** - A device in the non-connectable mode shall not allow a connection to be established. A Peripheral device in the non-connectable mode may send non-connectable advertising events.
+- **Directed Connectable Mode** - A device in the directed connectable mode shall accept a connection request from a known peer device performing the auto connection establishment procedure or the general connection establishment procedure. This mode shall only be used if the device has a known peer device address. A Peripheral device shall send connectable directed advertising events.
+- **Undirected Connectable Mode** - A device in the undirected connectable mode shall accept a connection request from a device performing the auto connection establishment procedure or the general connection establishment procedure. Peripheral device shall send either connectable and scannable undirected advertising events or connectable undirected advertising events.
 
 
 
+- **Auto Connection Establishment Procedure** - The auto connection establishment procedure allows the Host to configure the Controller to autonomously establish a connection with one or more devices in the directed connectable mode or the undirected connectable mode. White Lists in the Controller are used to store device addresses. This procedure uses the initiator White List in the Controller. The Controller autonomously establishes a connection with a device with the device address that matches the address stored in the White List.
+- **General Connection Establishment Procedure** - The general connection establishment procedure allows the Host to establish a connection with a set of known peer devices in the directed connectable mode or the undirected connectable mode.
+- **Selective Connection Establishment Procedure** - The selective connection establishment procedure allows the Host to establish a connection with the Host selected connection configuration parameters with a set of devices addresses in the White List. When the Host discovers one of the peer devices it is connecting to, the Host shall stop scanning, and initiate a connection using the direct connection establishment procedure with the connection configuration parameters for that peer device.
+- **Direct Connection Establishment Procedure** - The direct connection establishment procedure allows the Host to establish a connection with the Host selected connection configuration parameters with a single peer device.
+- **Connection Parameter Update Procedure** - The connection parameter update procedure allows a Peripheral or Central to update the Link Layer connection parameters of an established connection.
+- **Terminate Connection Procedure** - The terminate connection procedure allows a Host to terminate the connection with a peer device.
+
+------
+
+## BONDING MODES AND PROCEDURES
+
+Bonding allows two connected devices to exchange and store security and identity information to create a trusted relationship. When the devices store the bonding information, it is known as the phrases ‘devices have bonded’ or ‘a bond is created’.
+
+There are two modes for bonding, non-bondable mode and bondable mode. Bonding may only occur between two devices in bondable mode.
+
+- **Non-Bondable Mode** - A device in the non-bondable mode does not allow a bond to be created with a peer device. If a device does not support pairing as defined in the Security Manager section then it is considered to be in non-bondable mode.
+- **Bondable Mode** - A device in the bondable mode allows a bond to be created with a peer device in the bondable mode. The Host shall set the Bonding_Flags to ‘Bonding’ during the pairing procedure.
+- **Bonding Procedure** - The bonding procedure may be performed when a non-bonded device tries to access a service that requires bonding. The bonding procedure may be performed for the purpose of creating a bond between two devices. If the peer device is in the bondable mode, the devices shall exchange and store the bonding information in the security database.
+
+------
+
+## PERIODIC ADVERTISING MODES AND PROCEDURE
+
+The periodic advertising modes and procedure allow two or more devices to communicate in a unidirectional connectionless manner using extended advertising events and periodic advertising events.
+
+- **Periodic Advertising Synchronizability Mode** - The periodic advertising synchronizability mode provides a method for a device to send synchronization information about periodic advertising events. A device in the periodic advertising synchronizability mode shall send synchronization information for periodic advertising events in non-connectable and non-scannable extended advertising events.
+- **Periodic Advertising Mode** - The periodic advertising mode provides a method for a device to send advertising data at periodic and deterministic intervals. A device in the periodic advertising mode shall send periodic advertising events at the interval and using the frequency hopping sequence specified in the periodic advertising synchronization information.
+- **Periodic Advertising Synchronization Establishment Procedure** - The periodic advertising synchronization establishment procedure provides a method for a device to receive periodic advertising synchronization information and to synchronize to periodic advertisements. A device performing the periodic advertising synchronization establishment procedure shall scan for non-connectable and non-scannable advertising events containing synchronization information for periodic advertising events. When a device receives synchronization information for periodic advertising events, it may listen for periodic advertising events at the intervals and using the frequency hopping sequence specified in the synchronization information contained in the non-connectable and non-scannable extended advertising event.
+
+------
+
+## SECURITY ASPECTS – LE PHYSICAL TRANSPORT
+
+#### LE SECURITY MODES
+
+The security requirements of a device, a service or a service request are expressed in terms of a **security mode** and **security level**. There are two LE security modes, LE security mode 1 and LE security mode 2.
+
+LE security **mode 1** has the following security levels:
+
+- No security (No authentication and no encryption)
+- Unauthenticated pairing with encryption
+- Authenticated pairing with encryption
+- Authenticated LE Secure Connections pairing with encryption using a 128- bit strength encryption key.
+
+LE security **mode 2** has two security levels:
+
+- Unauthenticated pairing with data signing
+- Authenticated pairing with data signing
+
+LE security mode 2 shall only be used for connection based data signing.
+
+A device may be in a **Secure Connections Only** mode. When in Secure Connections Only mode only security mode 1 level 4 shall be used except for services that only require security mode 1 level 1.
+
+
+
+#### AUTHENTICATION PROCEDURE
+
+The authentication procedure describes how the required security is established when a device initiates a service request to a remote device and when a device receives a service request from a remote device. The authentication procedure covers LE security **mode 1**. The authentication procedure shall only be initiated after a connection has been established.
+
+**Responding to a Service Request**
+
+When a local device receives a service request from a remote device, it shall respond with an error code if the service request is denied. The error code is dependent on whether the current connection is encrypted or not and on the type of pairing that was performed to create the LTK or STK to be used. The local device will respond with the minimum security level required foraccess to its services.
+
+**Handling of GATT Indications and Notifications**
+
+A client “requests” a server to send indications and notifications by appropriately configuring the server via a Client Characteristic Configuration Descriptor. 
+
+Since the configuration is persistent across a disconnection and reconnection, security requirements must be checked upon a reconnection before sending indications or notifications. When a server reconnects to a client to send an indication or notification for which security is required, the server shall initiate or request encryption with the client prior to sending an indication or notification. 
+
+If the client does not have an LTK indicating that the client has lost the bond, enabling encryption will fail.
+
+
+
+#### DATA SIGNING
+
+The data signing is used for transferring authenticated data between two devices in an unencrypted connection. The data signing method is used by services that require fast connection set up and fast data transfer.
+
+If a service request specifies LE security mode 2, the connection data signing procedure shall be used.
+
+A device shall generate a new **Connection Signature Resolving Key** CSRK for each set of peer device(s) to which it sends signed data in connections.
+
+If encryption is not required and CSRK is available (LE security mode 2) then the data signing procedure shall be used when making a service request involving a write operation.
+
+If the link is encrypted and the server receives a request from a client for which the server requires data signing but does not require encryption, then the server shall complete the request if it is otherwise valid as the encrypted state of the link is considered to satisfy the signing requirement.
 
