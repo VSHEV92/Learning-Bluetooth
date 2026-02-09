@@ -189,3 +189,94 @@ If encryption is not required and CSRK is available (LE security mode 2) then th
 
 If the link is encrypted and the server receives a request from a client for which the server requires data signing but does not require encryption, then the server shall complete the request if it is otherwise valid as the encrypted state of the link is considered to satisfy the signing requirement.
 
+------
+
+## PRIVACY FEATURE
+
+Two modes of privacy exist:
+
+- **Device Privacy Mode**: When a device is in device privacy mode, it is only concerned about its own privacy. It should accept advertising packets from peer devices that contain their identity addresses as well as their private address, even if the peer device has distributed its IRK. A device shall only use this mode when the Resolvable Private Address Only characteristic is not present in the GAP service of the peer device.
+- **Network Privacy Mode**. When a device is in network privacy mode, it shallnot accept advertising packets containing the identity address of peer devices that have distributed their IRK.
+
+The privacy-enabled Peripheral shall use a resolvable private address as the advertiser's device address when in connectable mode. A Peripheral shall use non-resolvable or resolvable private addresses when in non-connectable mode.
+
+The Central shall use a resolvable private address as the initiator's device address. During active scanning, a privacy enabled Central shall use a non-resolvable or resolvable private address.
+
+For the purposes of this profile, the random device address may be of either of the following two sub-types:
+
+- **Static** address
+- **Private** address.
+
+The term random device address refers to both static and private address types.
+
+The private address may be of either of the following two sub-types:
+
+- **Non-resolvable** private address
+- **Resolvable** private address
+
+------
+
+## GAP SERVICE AND CHARACTERISTICS FOR GATT SERVER
+
+The GATT server shall contain the GAP service. A device shall have only one instance of the GAP service in the GATT server. The GAP service is a GATT based service with the service UUID as «GAP Service».
+
+![GAP](images/gap/gap-characteristics.png)
+
+#### DEVICE NAME CHARACTERISTIC (0x2A00)
+
+The Device Name characteristic shall contain the name of the device as an UTF-8 string.
+
+When the device is discoverable, the Device Name characteristic value shall be readable without authentication or authorization. When the device is not discoverable, the Device Name Characteristic should not be readable without authentication or authorization.
+
+The Device Name characteristic value shall be 0 to 248 octets in length. A device shall have only one instance of the Device Name characteristic.
+
+
+
+#### APPEARANCE CHARACTERISTIC (0x2A01)
+
+The Appearance characteristic defines the representation of the external appearance of the device. This enables the discovering device to represent the
+device to the user using an icon, or a string, or similar. 
+
+The Appearance characteristic value shall be readable without authentication or authorization.
+
+The Appearance characteristic value shall be the enumerated value as defined by Bluetooth Assigned Numbers document. The Appearance characteristic value shall be 2 octets in length. A device shall have only one instance of the Appearance characteristic.
+
+
+
+#### PERIPHERAL PREFERRED CONNECTION PARAMETERS CHARACTERISTIC (0x2A04)
+
+The Peripheral Preferred Connection Parameters (PPCP) characteristic contains the preferred connection parameters of the Peripheral.
+
+The Peripheral Preferred Connection Parameters characteristic value shall be readable. Authentication and authorization may be defined by a higher layer specification or be implementation specific.
+
+The Peripheral Preferred Connection Parameters characteristic value shall be 8 octets in length. A device shall have only one instance of the Peripheral Preferred Connection Parameters characteristic.
+
+The preferred connection parameters structured data is defined as follows:
+
+- Minimum connection interval
+- Maximum connection interval
+- Slave latency
+- Connection Supervision timeout multiplier
+
+
+
+#### CENTRAL ADDRESS RESOLUTION (0x2AA6)
+
+The Peripheral shall check if the peer device supports address resolution by reading the Central Address Resolution characteristic before using directed advertisement where the initiator address is set to a Resolvable Private Address (RPA).
+
+The Central Address Resolution characteristic defines whether the device supports privacy with address resolution.
+
+A device shall have only one instance of the Central Address Resolution characteristic. If the Central Address Resolution characteristic is not present, then it shall be assumed that Central Address Resolution is not supported.
+
+
+
+#### RESOLVABLE PRIVATE ADDRESS ONLY (0x2AC9)
+
+The device shall check if the peer will only use Resolvable Private Addresses (RPAs) after bonding by reading the Resolvable Private Address Only characteristic.
+
+The Resolvable Private Address Only characteristic defines whether the device will only use Resolvable Private Addresses (RPAs) as local addresses.
+
+A device shall have only one instance of the Resolvable Private Address Only characteristic. If the Resolvable Private Address Only characteristic is not present, then it cannot be assumed that only Resolvable Private Addresses will be used over the air.
+
+------
+
