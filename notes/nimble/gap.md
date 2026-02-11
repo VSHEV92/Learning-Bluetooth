@@ -2,12 +2,6 @@
 
 ------
 
-## Usage
-
-
-
-------
-
 ## Header Files
 
 
@@ -75,4 +69,15 @@ This header file provides data structures and API for internal usage.
 
 This file contain API used to interact with GAP
 
+**Structures**:
 
+- **ble_gap_slave_state** - The state of the in-progress slave connection.  If no slave connection is currently in progress, then the op field is set to BLE_GAP_OP_NULL. This structure contain callback **ble_gap_event_fn**, that triggered on each GAP event.
+- **ble_gap_slave[BLE_ADV_INSTANCES]** - static array of **ble_gap_slave_state** , that contain instances of slave connections
+- **ble_gap_master_state** - The state of the in-progress master connection.  If no master connection is currently in progress, then the op field is set to BLE_GAP_OP_NULL This structure contain callback **ble_gap_event_fn**, that triggered on each GAP event.
+- **ble_gap_master** - static structure of **ble_gap_master_state**, that contain instances of master connections
+
+**API**:
+
+- **ble_gap_adv_start()** - start LE advertising. Set  **ble_gap_slave[0]** connection parameters (callback, address type). Set advertising parameters using HCI (**ble_gap_adv_params_tx()**). Start advertising using HCI (**ble_gap_adv_enable_tx()**).
+- **ble_gap_disc()** - start LE scanning. Set  **ble_gap_master** connection parameters (callback, limited or not, observer or initiator). Set scanning parameters using HCI (**ble_gap_disc_tx_params()**). Start scanning using HCI (**ble_gap_disc_enable_tx()**).
+- **ble_gap_connect()** - start connect procedure. Set  **ble_gap_master** connection parameters (callback, address type). Start connection using HCI (**ble_gap_conn_create_tx()**)
