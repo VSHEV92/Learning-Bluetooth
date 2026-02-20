@@ -4,6 +4,10 @@
 
 ### CORE SPECIFICATION
 
+**Introduction**
+
+- [Architecture](./notes/core-spec/architecture.md)
+
 **Host**
 
 - [Logical Link Control And Adaptation Protocol (L2CAP)](./notes/core-spec/l2cap.md)
@@ -11,14 +15,6 @@
 - [Security Manager (SM)](./notes/core-spec/sm.md)
 - [Generic Access Profile (GAP)](./notes/core-spec/gap.md)
 - [Generic Attribute Profile (GATT)](./notes/core-spec/gatt.md)
-
-
-
-**BLE Controller**
-
-- TODO
-
-  
 
 ------
 
